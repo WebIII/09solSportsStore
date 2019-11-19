@@ -1,0 +1,49 @@
+﻿@model IEnumerable<SportsStore.Models.Domain.CartLine>
+
+@{
+    ViewData["Title"] = "Your cart";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="text-right">Quantity</th>
+            <th>Item</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">SubTotal</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var line in Model)
+        {
+            <tr>
+                <td class="text-right align-middle">@line.Quantity</td>
+                <td class="align-middle">@line.Product.Name</td>
+                <td class="text-right align-middle">@($"{line.Product.Price:F2} €")</td>
+                <td class="text-right align-middle">@($"{line.Total:F2} €")</td>
+                <td>
+                    <form method="post">
+                        <button type="submit" formaction="/Cart/Plus/@line.Product.ProductId" class="btn  btn-xs"><span class="fa fa-plus-circle"></span></button>
+                        <button type="submit" formaction="/Cart/Min/@line.Product.ProductId" class="btn  btn-xs"><span class="fa fa-minus-circle"></span></button>
+                        <button type="submit" formaction="/Cart/Remove/@line.Product.ProductId" class="btn  btn-xs"><span class="fa fa-times-circle"></span></button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" style="text-align: right">Total :</td>
+            <td style="text-align: right">@($"{ViewData["Total"]:F2} €")</td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+<div align="center" class="actionButtons">
+    <a asp-action="Index" asp-controller="Store" class="btn btn-secondary">Continue shopping</a>
+    <a asp-action="CheckOut" asp-controller="Cart" class="btn btn-secondary">Check out</a>
+</div>

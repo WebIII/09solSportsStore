@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SportsStore.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SportsStore.Data;
+using SportsStore.Data.Repositories;
+using SportsStore.Filters;
+using SportsStore.Models.Domain;
 
 namespace SportsStore {
     public class Startup {
@@ -26,14 +23,27 @@ namespace SportsStore {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
+
+            services
+                .AddScoped<SportsStoreDataInitializer>()
+                .AddScoped<IProductRepository, ProductRepository>()
+                .AddScoped<ICategoryRepository, CategoryRepository>()
+                .AddScoped<CartSessionFilter>();
+
+            services
+                .AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
+
             services.AddRazorPages();
+
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SportsStoreDataInitializer sportsStoreDataInitializer) {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -53,13 +63,17 @@ namespace SportsStore {
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseSession();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Store}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            sportsStoreDataInitializer.InitializeData();
         }
     }
 }

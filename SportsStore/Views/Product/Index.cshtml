@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Products";
+}
+<h2>@ViewData["Title"]</h2>
+
+<form>
+    <div class="form-inline">
+        <div class="form-group">
+            <label for="categoryId"></label>
+            <select id="categoryId" name="categoryId" asp-items="@(ViewData["Categories"] as SelectList)" class="form-control">
+                <option value="">-- all categories --</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-secondary ml-1">Submit</button>
+        <a asp-controller="Product" asp-action="Create" class="btn btn-secondary text-right ml-5">New Product</a>
+    </div>
+</form>
+<p></p>
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th class="text-right">Price</th>
+        <th class="text-center">In Stock</th>
+        <th>Availability</th>
+        <th></th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @item.Name
+            </td>
+            <td>
+                @item.Description
+            </td>
+            <td class="text-right">
+                @($"{item.Price:F2} €")
+            </td>
+            <td class="text-center">
+                @if (item.InStock)
+                {
+                    <i class="far fa-check-square"></i>
+                }
+                else
+                {
+                    <i class="far fa-square"></i>
+                }
+            </td>
+            <td>
+                @item.Availability
+            </td>
+            <td>
+                <a asp-controller="Product" asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
+                <a asp-controller="Product" asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+            </td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Product>
+
+@{
+    ViewData["Title"] = "The Store";
+}
+
+<h2>@ViewData["Title"] </h2>
+<div class="row">
+    @foreach (var product in Model)
+    {
+        <div class="col-md-6 col-lg-4 col-xs-12 pb-3">
+            <img src="~/Images/placeholder.gif" class="productimg img-rounded" alt="@product.Name">
+            <h4>@product.Name</h4>
+            <p>@product.Description</p>
+            <p><strong>@($"{product.Price:F2} €")</strong></p>
+            <form asp-controller="Cart" asp-action="Add" asp-route-id="@product.ProductId">
+                <div class="form-group">
+                    <label class="sr-only" for="quantity">Quantity</label>
+                    <input type="number" name="quantity" id="quantity" value="1" class="input-medium" />
+                </div>
+                <button type="submit" class="btn btn-outline-primary">
+                    <span class="fa fa-shopping-cart pr-1"></span>Add to cart
+                </button>
+            </form>
+            <br />
+        </div>
+    }
+</div>
