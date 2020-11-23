@@ -16,7 +16,7 @@ Voeg `Display` annotaties toe zodat de `Index` pagina als volgt wordt weergegeve
 - Maak in de `Index` view gebruik van de gegeven extension methode `GetDisplayName()` in de statische klasse `EnumHelpers` in de Helpers namespace voor het ophalen van de annotatie. 
 - Vergeet hierbij geen `using` statement te gebruiken in de view!
 
-![Product_Index.png](https://webiii.github.io/docs/H09/images/product-index.PNG "Index")
+![Product_Index.png](https://github.com/WebIII/portal/raw/master/docs/H09/images/product-index.PNG)
 
 Bekijk de code in de `EnumHelpers`. Zoek onderstaande op via de Object Browser of maak gebruik van F12: Goto definition 
 - Wat doet `typeof()`. 
@@ -29,7 +29,7 @@ Voeg annotaties toe voor de **weergave**.
 - Pas de view aan zodat de Property `AvailableTill` ook wordt weergegeven.  
 - Voeg annotaties toe zodat de labels correct worden weergegeven en `AvailableTill` als `Date` input field wordt weergegeven. 
 
-![Product_Edit.png](https://webiii.github.io/docs/H09/images/product-edit.PNG "Edit product")
+![Product_Edit.png](https://github.com/WebIII/portal/raw/master/docs/H09/images/product-edit.PNG)
 
 Voeg annotaties toe voor volgende validatie. Geef gepaste foutmeldingen. 
 - `Name`, `price`, `availability` en `category` zijn verplicht 
@@ -43,7 +43,7 @@ Voor de client-side validatie zijn er nog enkele wijzigingen nodig aan de view.
 
 > Opgelet: de decimale , die gebruikt wordt voor de Price zal niet naar behoren werken indien je een locale verschillend van en-US gebruikt. Deze issue werd in deze oplossing niet aangepakt, je geeft dus gehele getallen in voor de Price. Zie https://github.com/aspnet/Docs/issues/4076 en https://github.com/aspnet/Docs/issues/8585 
 
-![Product_Edit_Val.png](https://webiii.github.io/docs/H09/images/product-edit-val.PNG "Edit product validation")
+![Product_Edit_Val.png](https://github.com/WebIII/portal/raw/master/docs/H09/images/product-edit-val.PNG)
 
 Schrijf eerst de volgende unit testen voor de `Edit` methode. Train indien nodig verder de `mock`. Bekijk ook de overige unit testen binnen de region Edit 
 - `EditHttpPost_ProductNotFound_ReturnsNotFoundResult()`
