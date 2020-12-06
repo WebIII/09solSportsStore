@@ -8,33 +8,45 @@
 
 <hr />
 <form method="post">
+    <div asp-validation-summary="All"></div>
     <div class="form-group">
         <label asp-for="Name"></label>
         <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Description"></label>
         <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Price"></label>
         <input asp-for="Price" class="form-control" />
+        <span asp-validation-for="Price" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="InStock"></label>
         <input asp-for="InStock" />
+        <span asp-validation-for="InStock" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Availability"></label>
         <select asp-for="Availability" asp-items="Html.GetEnumSelectList<Availability>()" class="form-control">
             <option value="">-- select availability --</option>
         </select>
+        <span asp-validation-for="Availability" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="AvailableTill"></label>
+        <input asp-for="AvailableTill" class="form-control" />
+        <span asp-validation-for="AvailableTill" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="CategoryId"></label>
         <select asp-for="CategoryId" asp-items="@(ViewData["Categories"] as SelectList)" class="form-control">
             <option value="">-- select category --</option>
         </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
     <div>
         <button class="btn btn-primary" type="submit">Save</button>
@@ -42,4 +54,8 @@
     </div>
 </form>
 
-<p></p> 
+<p></p>
+@section scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+} 

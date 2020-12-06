@@ -40,7 +40,7 @@ namespace SportsStore.Controllers {
             try
             {
                 Product product = _productRepository.GetById(id);
-                product.EditProduct(editViewModel.Name, editViewModel.Description, editViewModel.Price, editViewModel.InStock, _categoryRepository.GetById(editViewModel.CategoryId), editViewModel.Availability);
+                product.EditProduct(editViewModel.Name, editViewModel.Description, editViewModel.Price, editViewModel.InStock, _categoryRepository.GetById(editViewModel.CategoryId), editViewModel.Availability, editViewModel.AvailableTill);
                 _productRepository.SaveChanges();
                 TempData["message"] = $"You successfully updated product {product.Name}.";
             }
