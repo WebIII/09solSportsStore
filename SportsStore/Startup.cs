@@ -10,16 +10,20 @@ using SportsStore.Data.Repositories;
 using SportsStore.Filters;
 using SportsStore.Models.Domain;
 
-namespace SportsStore {
-    public class Startup {
-        public Startup(IConfiguration configuration) {
+namespace SportsStore
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services) {
+        public void ConfigureServices(IServiceCollection services)
+        {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -43,7 +47,8 @@ namespace SportsStore {
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SportsStoreDataInitializer sportsStoreDataInitializer) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SportsStoreDataInitializer sportsStoreDataInitializer)
+        {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -73,7 +78,7 @@ namespace SportsStore {
                 endpoints.MapRazorPages();
             });
 
-            sportsStoreDataInitializer.InitializeData();
+            sportsStoreDataInitializer.InitializeData().Wait();
         }
     }
 }
