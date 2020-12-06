@@ -11,8 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace SportsStore.Tests.Controllers {
-    public class ProductControllerTest {
+namespace SportsStore.Tests.Controllers
+{
+    public class ProductControllerTest
+    {
         private readonly DummyApplicationDbContext _dummyContext;
         private readonly ProductController _productController;
         private readonly Mock<IProductRepository> _mockProductRepository;
@@ -20,7 +22,8 @@ namespace SportsStore.Tests.Controllers {
         private readonly Product _runningShoes;
         private readonly int _runningShoesId;
 
-        public ProductControllerTest() {
+        public ProductControllerTest()
+        {
             _dummyContext = new DummyApplicationDbContext();
             _mockProductRepository = new Mock<IProductRepository>();
             _mockCategoryRepository = new Mock<ICategoryRepository>();
@@ -34,7 +37,8 @@ namespace SportsStore.Tests.Controllers {
 
         #region == Index ==
         [Fact]
-        public void Index_AllCategories_PassesAllProductsSortedByNameInModelAndAllCategoriesSortedByNameInViewData() {
+        public void Index_AllCategories_PassesAllProductsSortedByNameInModelAndAllCategoriesSortedByNameInViewData()
+        {
             _mockProductRepository.Setup(p => p.GetAll()).Returns(_dummyContext.Products);
             _mockCategoryRepository.Setup(p => p.GetAll()).Returns(_dummyContext.Categories);
             var result = Assert.IsType<ViewResult>(_productController.Index());
@@ -47,7 +51,8 @@ namespace SportsStore.Tests.Controllers {
         }
 
         [Fact]
-        public void Index_ExistingCategory_PassesAllProductsFromThatCategorySortedByNameInModel() {
+        public void Index_ExistingCategory_PassesAllProductsFromThatCategorySortedByNameInModel()
+        {
             _mockCategoryRepository.Setup(p => p.GetByIdIncludingProducts(1)).Returns(_dummyContext.Soccer);
             var result = Assert.IsType<ViewResult>(_productController.Index(1));
             var products = Assert.IsType<List<Product>>(result.Model);
@@ -58,7 +63,8 @@ namespace SportsStore.Tests.Controllers {
 
         #region == Edit ==
         [Fact]
-        public void EditHttpGet_ValidProductId_PassesProductDetailsInAnEditViewModelAndPassesSelectListWithAllCategoriesInViewData() {
+        public void EditHttpGet_ValidProductId_PassesProductDetailsInAnEditViewModelAndPassesSelectListWithAllCategoriesInViewData()
+        {
             _mockProductRepository.Setup(p => p.GetById(1)).Returns(_dummyContext.RunningShoes);
             _mockCategoryRepository.Setup(c => c.GetAll()).Returns(_dummyContext.Categories);
             var result = Assert.IsType<ViewResult>(_productController.Edit(1));
@@ -69,13 +75,15 @@ namespace SportsStore.Tests.Controllers {
         }
 
         [Fact]
-        public void EditHttpGet_ProductNotFound_ReturnsNotFound() {
+        public void EditHttpGet_ProductNotFound_ReturnsNotFound()
+        {
             _mockProductRepository.Setup(p => p.GetById(1)).Returns(null as Product);
             Assert.IsType<NotFoundResult>(_productController.Edit(1));
         }
 
         [Fact]
-        public void EditHttpPost_ValidEdit_UpdatesAndPersistsTheProductAndRedirectsToIndex() {
+        public void EditHttpPost_ValidEdit_UpdatesAndPersistsTheProductAndRedirectsToIndex()
+        {
             _mockProductRepository.Setup(p => p.GetById(2)).Returns(_dummyContext.RunningShoes);
             _mockCategoryRepository.Setup(c => c.GetById(It.IsAny<int>())).Returns(_dummyContext.Soccer);
             var productVm = new EditViewModel(_dummyContext.RunningShoes)
@@ -92,7 +100,8 @@ namespace SportsStore.Tests.Controllers {
         }
 
         [Fact]
-        public void EditHttpPost_InValidEdit_DoesNotChangeNorPersistProductAndRedirectsToActionIndex() {
+        public void EditHttpPost_InValidEdit_DoesNotChangeNorPersistProductAndRedirectsToActionIndex()
+        {
             _mockProductRepository.Setup(m => m.GetById(2)).Returns(_dummyContext.RunningShoes);
             var productVm = new EditViewModel(_dummyContext.RunningShoes) { Price = -1 };
             var result = Assert.IsType<RedirectToActionResult>(_productController.Edit(2, productVm));
@@ -102,11 +111,49 @@ namespace SportsStore.Tests.Controllers {
             Assert.Equal("Index", result?.ActionName);
             _mockProductRepository.Verify(m => m.SaveChanges(), Times.Never());
         }
+
+        [Fact]
+        public void EditHttpPost_ProductNotFound_ReturnsNotFoundResult()
+        {
+            _mockProductRepository.Setup(p => p.GetById(999)).Returns(null as Product);
+            var productVm = new EditViewModel(_dummyContext.RunningShoes);
+            var action = _productController.Edit(999, productVm);
+            Assert.IsType<NotFoundResult>(action);
+        }
+
+        [Fact]
+        public void EditHttpPost_ModelStateErrors_DoesNotChangeNorPersistTheProduct()
+        {
+            _mockProductRepository.Setup(m => m.GetById(_runningShoesId)).Returns(_dummyContext.RunningShoes);
+            var productVm = new EditViewModel(_dummyContext.RunningShoes);
+            _productController.ModelState.AddModelError("", "Any error");
+            _productController.Edit(_runningShoesId, productVm);
+            var runningShoes = _dummyContext.RunningShoes;
+            Assert.Equal("Running shoes", runningShoes.Name);
+            Assert.Equal(95, runningShoes.Price);
+            _mockProductRepository.Verify(m => m.SaveChanges(), Times.Never());
+        }
+
+        [Fact]
+        public void EditHttpPost_ModelStateErrors_PassesEditViewModelInViewResultModelAndSelectListsinViewdata()
+        {
+            _mockProductRepository.Setup(p => p.GetById(_runningShoesId)).Returns(_dummyContext.RunningShoes);
+            _mockCategoryRepository.Setup(c => c.GetAll()).Returns(_dummyContext.Categories);
+            var productVm = new EditViewModel(_dummyContext.RunningShoes);
+            _productController.ModelState.AddModelError("", "Any error");
+            var result = Assert.IsType<ViewResult>(_productController.Edit(_runningShoesId, productVm));
+            productVm = Assert.IsType<EditViewModel>(result.Model);
+            Assert.Equal("Running shoes", productVm.Name);
+            var categories = Assert.IsType<SelectList>(result.ViewData["Categories"]);
+            Assert.Equal(3, categories.Count());
+        }
+
         #endregion
 
         #region == Create ==
         [Fact]
-        public void CreateHttpGet_PassesDetailsOfANewProductInAnEditViewModelToView() {
+        public void CreateHttpGet_PassesDetailsOfANewProductInAnEditViewModelToView()
+        {
             _mockCategoryRepository.Setup(c => c.GetAll()).Returns(_dummyContext.Categories);
             var result = Assert.IsType<ViewResult>(_productController.Create());
             var productVm = Assert.IsType<EditViewModel>(result.Model);
@@ -114,7 +161,8 @@ namespace SportsStore.Tests.Controllers {
         }
 
         [Fact]
-        public void CreateHttpPost_ValidProduct_AddsNewProductToRepositoryAndRedirectsToIndex() {
+        public void CreateHttpPost_ValidProduct_AddsNewProductToRepositoryAndRedirectsToIndex()
+        {
             _mockProductRepository.Setup(p => p.Add(It.IsNotNull<Product>()));
             _mockCategoryRepository.Setup(c => c.GetById(1)).Returns(_dummyContext.Soccer);
             var productVm = new EditViewModel()
@@ -131,7 +179,8 @@ namespace SportsStore.Tests.Controllers {
 
 
         [Fact]
-        public void CreateHttpPost_InvalidProduct_DoesNotCreateNorPersistsProductAndRedirectsToActionIndex() {
+        public void CreateHttpPost_InvalidProduct_DoesNotCreateNorPersistsProductAndRedirectsToActionIndex()
+        {
             _mockProductRepository.Setup(m => m.Add(It.IsAny<Product>()));
             var productVm = new EditViewModel()
             {
@@ -150,21 +199,24 @@ namespace SportsStore.Tests.Controllers {
 
         #region == Delete ==
         [Fact]
-        public void DeleteHttpGet_ProductFound_PassesProductNameInViewDataToView() {
+        public void DeleteHttpGet_ProductFound_PassesProductNameInViewDataToView()
+        {
             _mockProductRepository.Setup(p => p.GetById(1)).Returns(_dummyContext.RunningShoes);
             var result = _productController.Delete(1) as ViewResult;
             Assert.Equal("Running shoes", result?.ViewData["ProductName"]);
         }
 
         [Fact]
-        public void DeleteHttpGet_ProductNotFound_ReturnsNotFound() {
+        public void DeleteHttpGet_ProductNotFound_ReturnsNotFound()
+        {
             _mockProductRepository.Setup(p => p.GetById(1)).Returns(null as Product);
             var result = _productController.Delete(1);
             Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
-        public void DeleteHttpPost_ProductFound_DeletesProductAndRedirectsToIndex() {
+        public void DeleteHttpPost_ProductFound_DeletesProductAndRedirectsToIndex()
+        {
             _mockProductRepository.Setup(p => p.GetById(1)).Returns(_dummyContext.RunningShoes);
             _mockProductRepository.Setup(p => p.Delete(_dummyContext.RunningShoes));
             var result = Assert.IsType<RedirectToActionResult>(_productController.DeleteConfirmed(1));
@@ -174,9 +226,10 @@ namespace SportsStore.Tests.Controllers {
         }
 
         [Fact]
-        public void DeleteHttpPost_UnsuccessfullDelete_RedirectsToIndex() {
+        public void DeleteHttpPost_UnsuccessfullDelete_RedirectsToIndex()
+        {
             _mockProductRepository.Setup(p => p.GetById(1)).Throws<ArgumentException>();
-            var result = Assert.IsType<RedirectToActionResult>(_productController.DeleteConfirmed(1));        
+            var result = Assert.IsType<RedirectToActionResult>(_productController.DeleteConfirmed(1));
             Assert.Equal("Index", result?.ActionName);
         }
         #endregion
