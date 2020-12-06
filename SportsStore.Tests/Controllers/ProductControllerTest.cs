@@ -21,6 +21,7 @@ namespace SportsStore.Tests.Controllers
         private readonly Mock<ICategoryRepository> _mockCategoryRepository;
         private readonly Product _runningShoes;
         private readonly int _runningShoesId;
+        private readonly int _nonExistingProductId;
 
         public ProductControllerTest()
         {
@@ -28,6 +29,8 @@ namespace SportsStore.Tests.Controllers
             _mockProductRepository = new Mock<IProductRepository>();
             _mockCategoryRepository = new Mock<ICategoryRepository>();
             _mockProductRepository.Setup(p => p.GetById(1)).Returns(_dummyContext.RunningShoes);
+            _nonExistingProductId = 9999;
+            _mockProductRepository.Setup(p => p.GetById(_nonExistingProductId)).Returns(null as Product);
             _mockCategoryRepository.Setup(p => p.GetAll()).Returns(_dummyContext.Categories);
             _runningShoes = _dummyContext.RunningShoes;
             _runningShoesId = _runningShoes.ProductId;
@@ -76,8 +79,7 @@ namespace SportsStore.Tests.Controllers
         [Fact]
         public void EditHttpGet_ProductNotFound_ReturnsNotFound()
         {
-            _mockProductRepository.Setup(p => p.GetById(1)).Returns(null as Product);
-            Assert.IsType<NotFoundResult>(_productController.Edit(1));
+            Assert.IsType<NotFoundResult>(_productController.Edit(_nonExistingProductId));
         }
 
         [Fact]
@@ -114,9 +116,8 @@ namespace SportsStore.Tests.Controllers
         [Fact]
         public void EditHttpPost_ProductNotFound_ReturnsNotFoundResult()
         {
-            _mockProductRepository.Setup(p => p.GetById(999)).Returns(null as Product);
             var productVm = new EditViewModel(_dummyContext.RunningShoes);
-            var action = _productController.Edit(999, productVm);
+            var action = _productController.Edit(_nonExistingProductId, productVm);
             Assert.IsType<NotFoundResult>(action);
         }
 
@@ -248,6 +249,13 @@ namespace SportsStore.Tests.Controllers
             _mockProductRepository.Setup(p => p.GetById(1)).Throws<ArgumentException>();
             var result = Assert.IsType<RedirectToActionResult>(_productController.DeleteConfirmed(1));
             Assert.Equal("Index", result?.ActionName);
+        }
+
+        [Fact]
+        public void DeleteHttpPost_ProductNotFound_ReturnsNotFound()
+        {
+            var result = _productController.DeleteConfirmed(_nonExistingProductId);
+            Assert.IsType<NotFoundResult>(result);
         }
         #endregion
     }

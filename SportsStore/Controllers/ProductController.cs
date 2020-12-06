@@ -111,6 +111,8 @@ namespace SportsStore.Controllers
             try
             {
                 Product product = _productRepository.GetById(id);
+                if (product == null)
+                    return NotFound();
                 _productRepository.Delete(product);
                 _productRepository.SaveChanges();
                 TempData["message"] = $"You successfully deleted product {product.Name}.";
