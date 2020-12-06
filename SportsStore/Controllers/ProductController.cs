@@ -76,18 +76,24 @@ namespace SportsStore.Controllers
         [HttpPost]
         public IActionResult Create(EditViewModel editViewModel)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var product = new Product(editViewModel.Name, editViewModel.Price, _categoryRepository.GetById(editViewModel.CategoryId), editViewModel.Description, editViewModel.InStock, editViewModel.Availability);
-                _productRepository.Add(product);
-                _productRepository.SaveChanges();
-                TempData["message"] = $"You successfully added product {product.Name}.";
+                try
+                {
+                    var product = new Product(editViewModel.Name, editViewModel.Price, _categoryRepository.GetById(editViewModel.CategoryId), editViewModel.Description, editViewModel.InStock, editViewModel.Availability, editViewModel.AvailableTill);
+                    _productRepository.Add(product);
+                    _productRepository.SaveChanges();
+                    TempData["message"] = $"You successfully added product {product.Name}.";
+                }
+                catch
+                {
+                    TempData["error"] = "Sorry, something went wrong, the product was not added...";
+                }
+                return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                TempData["error"] = "Sorry, something went wrong, the product was not added...";
-            }
-            return RedirectToAction(nameof(Index));
+            ViewData["IsEdit"] = false;
+            ViewData["Categories"] = GetCategoriesSelectList();
+            return View(nameof(Edit), editViewModel);
         }
 
         public IActionResult Delete(int id)
