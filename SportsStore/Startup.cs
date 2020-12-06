@@ -9,6 +9,7 @@ using SportsStore.Data;
 using SportsStore.Data.Repositories;
 using SportsStore.Filters;
 using SportsStore.Models.Domain;
+using System.Security.Claims;
 
 namespace SportsStore
 {
@@ -30,6 +31,11 @@ namespace SportsStore
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddAuthorization(options => {
+                options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
+                options.AddPolicy("Customer", policy => policy.RequireClaim(ClaimTypes.Role, "Customer"));
+            });
 
             services
                 .AddScoped<SportsStoreDataInitializer>()

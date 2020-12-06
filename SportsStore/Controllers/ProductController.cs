@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SportsStore.Models.Domain;
 using SportsStore.Models.ProductViewModels;
@@ -7,6 +8,7 @@ using System.Linq;
 
 namespace SportsStore.Controllers
 {
+    [Authorize(Policy = "Admin")]
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;

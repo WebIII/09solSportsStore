@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SportsStore.Filters;
 using SportsStore.Models.Domain;
 
@@ -48,6 +49,12 @@ namespace SportsStore.Controllers {
         public IActionResult Min(int id, Cart cart) {
             cart.DecreaseQuantity(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Policy = "Customer")]
+        public IActionResult Checkout()
+        {
+            return View();
         }
     }
 }

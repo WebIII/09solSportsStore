@@ -2,6 +2,7 @@
 using SportsStore.Models.Domain;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SportsStore.Data
@@ -53,7 +54,7 @@ namespace SportsStore.Data
                 {
                     Customer klant = new Customer("student" + i, "Student" + i, "Jan", "Nieuwstraat 10", cities[r.Next(2)]);
                     var userName = klant.CustomerName + "@hogent.be";
-                    await CreateUser(userName, userName, "P@ssword1");
+                    await CreateUser(userName, userName, "P@ssword1", "Customer");
                     if (i <= 5)
                     {
                         Cart cart = new Cart();
@@ -63,15 +64,16 @@ namespace SportsStore.Data
                     }
                     _dbContext.Customers.Add(klant);
                 }
-                await CreateUser("admin@sportsstore.be", "admin@sportsstore.be", "P@ssword1");
+                await CreateUser("admin@sportsstore.be", "admin@sportsstore.be", "P@ssword1", "Admin");
                 _dbContext.SaveChanges();
             }
         }
 
-        private async Task CreateUser(string userName, string email, string password)
+        private async Task CreateUser(string userName, string email, string password, string role)
         {
             var user = new IdentityUser { UserName = userName, Email = email };
             await _userManager.CreateAsync(user, password);
+            await _userManager.AddClaimAsync(user, new Claim(ClaimTypes.Role, role));
         }
     }
 }
